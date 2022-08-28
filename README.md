@@ -23,3 +23,10 @@ To run the script, locate to the root (where this README.md is located) and the 
 poetry install
 poetry run python src/run.py
 ```
+
+## Troubleshooting
+You may get the following error: 
+```
+spotipy.oauth2.SpotifyOauthError: error: invalid_grant, error_description: Refresh token revoked
+```
+To address this you need to delete the .cache which is where the token is stored
