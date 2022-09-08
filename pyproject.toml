@@ -8,6 +8,7 @@ authors = ["Jane Baxter"]
 python = "^3.9"
 loguru = "^0.6.0"
 spotipy = "^2.20.0"
+pre-commit = "^2.20.0"
 
 [tool.poetry.dev-dependencies]
 black = {version = "^22.6.0", allow-prereleases = true}

@@ -25,7 +25,7 @@ poetry run python src/run.py
 ```
 
 ## Troubleshooting
-You may get the following error: 
+You may get the following error:
 ```
 spotipy.oauth2.SpotifyOauthError: error: invalid_grant, error_description: Refresh token revoked
 ```
