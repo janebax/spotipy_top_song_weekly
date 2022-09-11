@@ -30,7 +30,7 @@ repos:
 
   # Python formatting
   - repo: https://github.com/psf/black
-    rev: 21.12b0
+    rev: 22.3.0
     hooks:
       - id: black
 
@@ -39,6 +39,8 @@ repos:
     rev: "4.0.1" # pick a git hash / tag to point to
     hooks:
       - id: flake8
+        exclude: ^tests/
+        args: [--max-line-length=88]
 
   # Commit message
   - repo: https://github.com/commitizen-tools/commitizen
@@ -52,3 +54,6 @@ repos:
     rev: 6.1.1 # pick a git hash / tag to point to
     hooks:
       - id: pydocstyle
+        exclude: ^tests/
+        args:
+        - --ignore=D103, D213

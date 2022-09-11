@@ -30,3 +30,9 @@ You may get the following error:
 spotipy.oauth2.SpotifyOauthError: error: invalid_grant, error_description: Refresh token revoked
 ```
 To address this you need to delete the .cache which is where the token is stored
+
+## Tests
+To run the tests run the following command from root:
+```
+poetry run pytest tests/
+```
