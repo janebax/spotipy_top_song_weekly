@@ -1,54 +1,46 @@
+"""Run script to get top song each week."""
 import os
-import spotipy
-from pprint import pprint
-from spotipy.oauth2 import SpotifyOAuth
+from datetime import datetime, timedelta
+
+import requests
 from loguru import logger
+
+import util_functions as utils
 
 
 def main():
 
-    PLAYLIST_NAME = "top_songs_weekly"
+    # Documentation for our request is here:
+    # https://www.last.fm/api/show/user.getRecentTracks
+    LASTFM_API_KEY = os.environ["LASTFM_API_KEY"]
+    LASTFM_USERNAME = os.environ["LASTFM_USERNAME"]
 
-    scope = "user-top-read playlist-modify-public playlist-modify-private"
-    sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope=scope))
+    # Using an identifiable user agent on requests to LastFM's API reduces the risk of
+    # you getting banned.
+    headers = {"user-agent": LASTFM_USERNAME}
+    url = (
+        f"http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=rj"
+        f"&api_key={LASTFM_API_KEY}&format=json"
+    )
+    current_date_minus_wk = datetime.today() - timedelta(days=7)
 
-    # Limitations of the Spotify API mean that we can only access listening history for '4 weeks' rather than suggesting a date range.
-    range = "short_term"
-    results = sp.current_user_top_tracks(time_range=range, limit=1)
+    payload = {
+        "user": LASTFM_USERNAME,
+        "api_key": LASTFM_API_KEY,
+        "method": "user.getRecentTracks",
+        "format": "json",
+        "from": current_date_minus_wk,
+    }
 
-    song_name = results["items"][0]["name"]
-    artist_name = results["items"][0]["artists"][0]["name"]
-    song_uri = results["items"][0]["uri"]
+    r = requests.get(url, headers=headers, params=payload)
+    if r.status_code == 200:
+        logger.debug(f"Status code {r.status_code} - Successful")
+    else:
+        logger.debug(f"Status code {r.status_code} - Unsuccessful")
 
-    logger.info(f"Top song is {song_name} by {artist_name}. Song URI: {song_uri}")
-
-    logger.info(f"Checking if playlist {PLAYLIST_NAME} already exists...")
-    playlists = sp.current_user_playlists(limit=50)  # Assumes no more than 50 playlists
-
-    # Convert this to a while for efficiency and into a dict comprehension
-    playlist_exists_flag = False
-    for playlist in playlists["items"]:
-        print(playlist["name"])
-        if playlist["name"] == PLAYLIST_NAME:
-            playlist_exists_flag = True
-            logger.info(f"Playlist {PLAYLIST_NAME} already exists")
-
-    if playlist_exists_flag == False:
-        logger.info(f"Playlist {PLAYLIST_NAME} does not exist!")
-        sp.user_playlist_create(
-            os.environ["SPOTIPY_USERNAME"], PLAYLIST_NAME, public=True, description=""
-        )
-        logger.info(f"Created playlist {PLAYLIST_NAME}")
-
-    playlists = sp.current_user_playlists(limit=50)  # Assumes no more than 50 playlists
-    for playlist in playlists["items"]:
-        if playlist["name"] == PLAYLIST_NAME:
-            playlist_id = playlist["id"]
-
-    sp.playlist_add_items(playlist_id, [song_uri], position=1)
-    logger.info(f"Added song {song_name} by {artist_name} to {PLAYLIST_NAME}")
-
-    logger.info("Finished script")
+    all_songs_df = utils.extract_tracks_df(r.json())
+    top_song_artist, top_song_name = utils.get_top_song(all_songs_df)
+    logger.info(f"Top Song for the past week is {top_song_artist}: {top_song_name}")
 
 
 if __name__ == "__main__":
