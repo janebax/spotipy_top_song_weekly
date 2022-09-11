@@ -1,20 +1,18 @@
-Scripts to get most frequently played song on my Spotify account and add it to a playlist
+An app to get most frequently played song on my Spotify account in a given week and add it to a playlist
 
 ## TODOs
-- Currently the script can only get top songs from the past 4 weeks however we want to look at the last week. Next steps will be to update the song query to LastFM's API where I can get this information
+- Add in Spotify code to Search for the song and add to playlist
 
-## Spotify Setup
+## LastFM Setup
 
-You will first need to set up a Developer account on your Spotify account here and create an app. Use this to get your SPOTIPY_CLIENT_ID and SPOTIPY_CLIENT_SECRET. Your username will be on a seperate account page for your Spotify account. You will need to specify the redirect URI to a location of your choice - to run this locally I have used 'http://localhost:8888/callback'
+You will first need to set up an account with LastFM in order to get the listening date associated with your songs (it's not available on the Spotify API). When set up with LastFM, connect it to your Spotify account.
 
 ## Set environment variables
 
-This allows the SpotifyOAuth object to get user information
+This allows the the app to get information from the LastFM api
 ```
-export SPOTIPY_USERNAME='your-spotify-username'
-export SPOTIPY_CLIENT_ID='your-spotify-client-id'
-export SPOTIPY_CLIENT_SECRET='your-spotify-client-secret'
-export SPOTIPY_REDIRECT_URI='your-app-redirect-url'
+export LASTFM_USERNAME='your-lastfm-username'
+export LASTFM_API_KEY='your-lastfmgi-api-key'
 ```
 
 ## Running the script
@@ -23,13 +21,6 @@ To run the script, locate to the root (where this README.md is located) and the 
 poetry install
 poetry run python src/run.py
 ```
-
-## Troubleshooting
-You may get the following error:
-```
-spotipy.oauth2.SpotifyOauthError: error: invalid_grant, error_description: Refresh token revoked
-```
-To address this you need to delete the .cache which is where the token is stored
 
 ## Tests
 To run the tests run the following command from root:
